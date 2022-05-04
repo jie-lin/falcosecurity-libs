@@ -73,6 +73,8 @@ option(WITH_CHISEL "Include chisel implementation" OFF)
 
 option(CREATE_TEST_TARGETS "Enable make-targets for unit testing" ON)
 
+option(INSTALL_LIBS "Actually install files during the install step." ON)
+
 include(libscap)
 include(libsinsp)
 

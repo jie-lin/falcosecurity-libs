@@ -1217,6 +1217,9 @@ sinsp_thread_manager::sinsp_thread_manager(sinsp* inspector)
 {
 	m_inspector = inspector;
 	clear();
+	m_added = 0;
+	m_removed = 0;
+	m_actually_removed = 0;
 }
 
 void sinsp_thread_manager::clear()
@@ -1263,6 +1266,7 @@ bool sinsp_thread_manager::add_thread(sinsp_threadinfo *threadinfo, bool from_sc
 #ifdef GATHER_INTERNAL_STATS
 	m_added_threads->increment();
 #endif
+	m_added++;
 
 	m_last_tinfo.reset();
 
@@ -1298,6 +1302,8 @@ void sinsp_thread_manager::remove_thread(int64_t tid, bool force)
 {
 	uint64_t nchilds;
 	sinsp_threadinfo* tinfo = m_threadtable.get(tid);
+
+	m_removed++;
 
 	if(tinfo == nullptr)
 	{
@@ -1377,6 +1383,7 @@ void sinsp_thread_manager::remove_thread(int64_t tid, bool force)
 		m_removed_threads->increment();
 #endif
 
+		m_actually_removed++;
 		m_threadtable.erase(tid);
 
 		//

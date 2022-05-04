@@ -616,6 +616,10 @@ public:
 		return (uint32_t)m_threadtable.size();
 	}
 
+	uint64_t m_added;
+	uint64_t m_removed;
+	uint64_t m_actually_removed;
+
 	void update_statistics();
 
 	threadinfo_map_t* get_threads()

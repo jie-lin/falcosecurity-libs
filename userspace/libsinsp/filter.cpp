@@ -176,7 +176,7 @@ bool flt_compare_string(cmpop op, char* operand1, char* operand2)
 		return (strncmp(operand1, operand2, strlen(operand2)) == 0);
 	case CO_BSTARTSWITH:
 		throw sinsp_exception("'bstartswith' not supported for string filters");
-	case CO_ENDSWITH: 
+	case CO_ENDSWITH:
 		return (sinsp_utils::endswith(operand1, operand2));
 	case CO_GLOB:
 		return sinsp_utils::glob_match(operand2, operand1);
@@ -229,7 +229,7 @@ bool flt_compare_buffer(cmpop op, char* operand1, char* operand2, uint32_t op1_l
 		}
 		return hex_bytes.size() <= op1_len && (memcmp(operand1, &hex_bytes[0], hex_bytes.size()) == 0);
 	}
-	case CO_ENDSWITH: 
+	case CO_ENDSWITH:
 		return (sinsp_utils::endswith(operand1, operand2, op1_len, op2_len));
 	case CO_GLOB:
 		throw sinsp_exception("'glob' not supported for buffer filters");
@@ -774,6 +774,7 @@ Json::Value sinsp_filter_check::rawval_to_json(uint8_t* rawval,
 		case PT_IPV4ADDR:
 		case PT_IPV6ADDR:
 		case PT_IPADDR:
+                case PT_IPNET:
 		case PT_FSRELPATH:
 			return rawval_to_string(rawval, ptype, print_format, len);
 		default:
@@ -1076,6 +1077,11 @@ char* sinsp_filter_check::rawval_to_string(uint8_t* rawval,
 					 sizeof(m_getpropertystr_storage),
 					 "%.1lf", *(double*)rawval);
 			return m_getpropertystr_storage;
+                case PT_IPNET:
+			snprintf(m_getpropertystr_storage,
+					 sizeof(m_getpropertystr_storage),
+				 "<IPNET>");
+			return m_getpropertystr_storage;
 		default:
 			ASSERT(false);
 			throw sinsp_exception("wrong event type " + to_string((long long) ptype));
@@ -1295,7 +1301,7 @@ bool sinsp_filter_check::flt_compare(cmpop op, ppm_param_type type, vector<extra
 					+ "' only supports operators 'in' and 'intersects'");
 		}
 	}
-	else if (values.size() > 1)
+	else if (values.size() != 1)
 	{
 		ASSERT(false);
 		throw sinsp_exception("non-list filter '"
@@ -1424,6 +1430,9 @@ bool sinsp_filter_check::extract_cached(sinsp_evt *evt, OUT vector<extract_value
 			extract(evt, m_extraction_cache_entry->m_res, sanitize_strings);
 		}
 
+		// Shallow-copy the cached values to values
+		values = m_extraction_cache_entry->m_res;
+
 		return !m_extraction_cache_entry->m_res.empty();
 	}
 	else
@@ -1545,7 +1554,7 @@ sinsp_filter* sinsp_filter_compiler::compile()
 		}
 		catch (const sinsp_exception& e)
 		{
-			throw sinsp_exception("filter error at " 
+			throw sinsp_exception("filter error at "
 				+ parser.get_pos().as_string() + ": " + e.what());
 		}
 	}
@@ -1564,7 +1573,7 @@ sinsp_filter* sinsp_filter_compiler::compile()
 	m_filter = new_sinsp_filter;
 	m_last_boolop = BO_NONE;
 	m_expect_values = false;
-	try 
+	try
 	{
 		m_flt_ast->accept(this);
 	}
@@ -1650,7 +1659,7 @@ void sinsp_filter_compiler::visit(libsinsp::filter::ast::binary_check_expr* e)
 	check->parse_field_name(field.c_str(), true, true);
 	check->set_check_id(m_check_id);
 
-	// Read the the the right-hand values of the filtercheck. 
+	// Read the the the right-hand values of the filtercheck.
 	// For list-related operators ('in', 'intersects', 'pmatch'), the vector
 	// can be filled with more than 1 value, whereas in all other cases we
 	// expect the vector to only have 1 value. We don't check this here, as

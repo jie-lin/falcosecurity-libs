@@ -4544,7 +4544,7 @@ uint8_t* sinsp_filter_check_event::extract(sinsp_evt *evt, OUT uint32_t* len, bo
 				{
 					m_u32val = 1;
 				}
-				
+
 				/* `open_by_handle_at` exit event has no `mode` parameter. */
 				if(m_field_id == TYPE_ISOPEN_EXEC && (flags & (PPM_O_TMPFILE | PPM_O_CREAT) && etype != PPME_SYSCALL_OPEN_BY_HANDLE_AT_X))
 				{
@@ -6161,6 +6161,11 @@ int32_t sinsp_filter_check_container::extract_arg(const string &val, size_t base
 	}
 
 	return end+1;
+}
+
+const std::string &sinsp_filter_check_container::get_argstr()
+{
+	return m_argstr;
 }
 
 int32_t sinsp_filter_check_container::parse_field_name(const char* str, bool alloc_state, bool needed_for_filtering)

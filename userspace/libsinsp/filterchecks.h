@@ -170,7 +170,7 @@ protected:
 	// multiple values. By default, this returns NULL.
 	// Subclasses are meant to either override this, or the multi-valued extract method.
 	virtual uint8_t* extract(sinsp_evt *evt, OUT uint32_t* len, bool sanitize_strings = true);
-	
+
 	bool flt_compare(cmpop op, ppm_param_type type, void* operand1, uint32_t op1_len = 0, uint32_t op2_len = 0);
 	bool flt_compare(cmpop op, ppm_param_type type, vector<extract_value_t>& values, uint32_t op2_len = 0);
 
@@ -783,6 +783,7 @@ public:
 	sinsp_filter_check* allocate_new();
 	uint8_t* extract(sinsp_evt *evt, OUT uint32_t* len, bool sanitize_strings = true);
 
+	const std::string &get_argstr();
 private:
 	int32_t parse_field_name(const char* str, bool alloc_state, bool needed_for_filtering);
 	int32_t extract_arg(const string& val, size_t basename);
