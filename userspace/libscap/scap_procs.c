@@ -290,7 +290,7 @@ int32_t scap_proc_fill_info_from_stats(scap_t *handle, char* procdirname, struct
 		}
 	}
 
-	ASSERT(nfound == 13 || nfound == 7 || nfound == 6);
+	ASSERT(nfound == 13 || nfound == 10 || nfound == 7 || nfound == 6);
 
 	fclose(f);
 
